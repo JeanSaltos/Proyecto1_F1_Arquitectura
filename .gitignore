@@ -1,0 +1,39 @@
+# ═══════════════════════════════════════════════════════
+# LogiFlow — .gitignore
+# ═══════════════════════════════════════════════════════
+
+# ── Build outputs ──
+target/
+build/
+*.jar
+*.war
+*.class
+
+# ── IDE ──
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+*.swo
+
+# ── Maven ──
+.mvn/wrapper/maven-wrapper.jar
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ──
+*.log
+logs/
+
+# ── Environment / Secrets ──
+.env
+*.env
+application-local.properties

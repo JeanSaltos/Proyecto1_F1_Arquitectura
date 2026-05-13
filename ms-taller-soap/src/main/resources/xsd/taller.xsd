@@ -1,0 +1,50 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:tns="http://espe.edu.ec/taller/ws"
+           targetNamespace="http://espe.edu.ec/taller/ws" 
+           elementFormDefault="qualified">
+
+    <!-- Elements for consultarVehiculo -->
+    <xs:element name="ConsultarVehiculoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="matricula" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ConsultarVehiculoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="vehiculo" type="tns:Vehiculo"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="Vehiculo">
+        <xs:sequence>
+            <xs:element name="matricula" type="xs:string"/>
+            <xs:element name="marca" type="xs:string"/>
+            <xs:element name="modelo" type="xs:string"/>
+            <xs:element name="anio" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Elements for registrarOrdenMantenimiento -->
+    <xs:element name="RegistrarOrdenMantenimientoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="matricula" type="xs:string"/>
+                <xs:element name="descripcion" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="RegistrarOrdenMantenimientoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="mensaje" type="xs:string"/>
+                <xs:element name="idOrden" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
