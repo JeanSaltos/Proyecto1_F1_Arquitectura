@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ConductorRepository extends JpaRepository<Conductor, Long> {
+public interface ConductorRepository extends JpaRepository<Conductor, java.util.UUID> {
     Optional<Conductor> findByCedula(String cedula);
     boolean existsByCedula(String cedula);
 }

@@ -37,7 +37,7 @@ public class ConductorController {
             @ApiResponse(responseCode = "200", description = "Conductor encontrado"),
             @ApiResponse(responseCode = "404", description = "Conductor no encontrado")
     })
-    public ResponseEntity<Conductor> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<Conductor> obtenerPorId(@PathVariable java.util.UUID id) {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
@@ -78,7 +78,7 @@ public class ConductorController {
             @ApiResponse(responseCode = "404", description = "Conductor no encontrado"),
             @ApiResponse(responseCode = "409", description = "Conflicto con cédula duplicada")
     })
-    public ResponseEntity<Conductor> actualizar(@PathVariable Long id, @Valid @RequestBody ConductorDTO dto) {
+    public ResponseEntity<Conductor> actualizar(@PathVariable java.util.UUID id, @Valid @RequestBody ConductorDTO dto) {
         return ResponseEntity.ok(service.actualizar(id, dto));
     }
 
@@ -88,7 +88,7 @@ public class ConductorController {
             @ApiResponse(responseCode = "204", description = "Conductor eliminado"),
             @ApiResponse(responseCode = "404", description = "Conductor no encontrado")
     })
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable java.util.UUID id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }

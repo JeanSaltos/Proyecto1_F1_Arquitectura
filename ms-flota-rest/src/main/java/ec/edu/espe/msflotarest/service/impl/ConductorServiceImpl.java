@@ -27,7 +27,7 @@ public class ConductorServiceImpl implements IConductorService {
 
     @Override
     @Transactional(readOnly = true)
-    public Conductor buscarPorId(Long id) {
+    public Conductor buscarPorId(java.util.UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con ID: " + id));
     }
@@ -53,7 +53,7 @@ public class ConductorServiceImpl implements IConductorService {
 
     @Override
     @Transactional
-    public Conductor actualizar(Long id, ConductorDTO dto) {
+    public Conductor actualizar(java.util.UUID id, ConductorDTO dto) {
         Conductor conductorExistente = buscarPorId(id);
 
         // Validar si la cédula cambió y si la nueva ya existe
@@ -68,7 +68,7 @@ public class ConductorServiceImpl implements IConductorService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public void eliminar(java.util.UUID id) {
         if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("Error al eliminar: Conductor con ID " + id + " no encontrado");
         }

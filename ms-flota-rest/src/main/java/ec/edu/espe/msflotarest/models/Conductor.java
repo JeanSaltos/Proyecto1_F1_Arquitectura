@@ -12,8 +12,8 @@ import lombok.*;
 @NoArgsConstructor
 public class Conductor {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private java.util.UUID id;
 
     @Column(unique = true, nullable = false)
     private String cedula;

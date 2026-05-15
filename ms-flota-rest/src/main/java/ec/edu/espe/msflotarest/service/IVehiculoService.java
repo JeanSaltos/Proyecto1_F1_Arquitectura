@@ -11,7 +11,7 @@ public interface IVehiculoService {
     List<Vehiculo> listarTodos();
 
     // Buscar un vehículo específico por su ID interno
-    Vehiculo buscarPorId(Long id);
+    Vehiculo buscarPorId(java.util.UUID id);
 
     // Buscar por matrícula (útil para validaciones de ruteo)
     Vehiculo buscarPorMatricula(String matricula);
@@ -20,12 +20,12 @@ public interface IVehiculoService {
     Vehiculo crear(VehiculoDTO vehiculoDTO);
 
     // Actualizar datos técnicos o estado operativo
-    Vehiculo actualizar(Long id, VehiculoDTO vehiculoDTO);
+    Vehiculo actualizar(java.util.UUID id, VehiculoDTO vehiculoDTO);
 
     // Eliminar un vehículo de la flota
-    void eliminar(Long id);
+    void eliminar(java.util.UUID id);
 
     // Cambiar estado (Disponible, Mantenimiento, En Servicio)
     // Este metodo será vital para el módulo de ruteo en el futuro
-    Vehiculo actualizarEstado(Long id, String nuevoEstado);
+    Vehiculo actualizarEstado(java.util.UUID id, String nuevoEstado);
 }
