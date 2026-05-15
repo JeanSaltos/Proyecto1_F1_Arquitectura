@@ -40,7 +40,7 @@ public class VehiculoController {
             @ApiResponse(responseCode = "200", description = "Vehículo encontrado"),
             @ApiResponse(responseCode = "404", description = "Vehículo no encontrado")
     })
-    public ResponseEntity<Vehiculo> obtener(@PathVariable Long id) {
+    public ResponseEntity<Vehiculo> obtener(@PathVariable java.util.UUID id) {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
@@ -84,7 +84,7 @@ public class VehiculoController {
             @ApiResponse(responseCode = "404", description = "Vehículo no encontrado"),
             @ApiResponse(responseCode = "409", description = "Conflicto con matrícula duplicada")
     })
-    public ResponseEntity<Vehiculo> actualizar(@PathVariable Long id, @Valid @RequestBody VehiculoDTO dto) {
+    public ResponseEntity<Vehiculo> actualizar(@PathVariable java.util.UUID id, @Valid @RequestBody VehiculoDTO dto) {
         return ResponseEntity.ok(service.actualizar(id, dto));
     }
 
@@ -94,7 +94,7 @@ public class VehiculoController {
             @ApiResponse(responseCode = "204", description = "Vehículo eliminado"),
             @ApiResponse(responseCode = "404", description = "Vehículo no encontrado")
     })
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable java.util.UUID id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }
@@ -108,7 +108,7 @@ public class VehiculoController {
             @ApiResponse(responseCode = "404", description = "Vehículo no encontrado")
     })
     public ResponseEntity<Vehiculo> cambiarEstado(
-            @PathVariable Long id,
+            @PathVariable java.util.UUID id,
             @Parameter(description = "Nuevo estado: DISPONIBLE | EN_SERVICIO | MANTENIMIENTO")
             @RequestParam String nuevoEstado) {
         return ResponseEntity.ok(service.actualizarEstado(id, nuevoEstado));

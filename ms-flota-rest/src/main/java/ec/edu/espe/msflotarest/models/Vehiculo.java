@@ -14,17 +14,17 @@ import lombok.*;
 @NoArgsConstructor
 public class Vehiculo {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private java.util.UUID id;
 
     @Column(unique = true, nullable = false)
-    private String matricula; //
+    private String matricula;
 
     @Enumerated(EnumType.STRING)
-    private TipoVehiculo tipo; //
+    private TipoVehiculo tipo;
 
-    private Double capacidad; // En kg
+    private Double capacidad;
 
     @Enumerated(EnumType.STRING)
-    private EstadoVehiculo estado; //
+    private EstadoVehiculo estado; 
 }

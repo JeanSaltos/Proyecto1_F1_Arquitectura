@@ -1,4 +1,4 @@
-package ec.edu.espe.taller.anticorruption;
+package ec.edu.espe.taller.models;
 
 /**
  * Modelo interno del dominio de Taller para órdenes de mantenimiento.

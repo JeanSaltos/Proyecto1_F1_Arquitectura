@@ -27,7 +27,7 @@ public class OpenApiConfig {
                                 "incluyendo consulta de disponibilidad para el módulo de Ruteo y Despacho.")
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name("Equipo LogiFlow — ESPE")
+                                .name("Saltos y Velasquez — ESPE")
                                 .email("logiflow@espe.edu.ec"))
                         .license(new License()
                                 .name("Uso Académico")

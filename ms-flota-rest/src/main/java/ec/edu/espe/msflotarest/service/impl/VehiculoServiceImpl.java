@@ -27,7 +27,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
     @Override
     @Transactional(readOnly = true)
-    public Vehiculo buscarPorId(Long id) {
+    public Vehiculo buscarPorId(java.util.UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehículo no encontrado con ID: " + id));
     }
@@ -53,7 +53,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
     @Override
     @Transactional
-    public Vehiculo actualizar(Long id, VehiculoDTO dto) {
+    public Vehiculo actualizar(java.util.UUID id, VehiculoDTO dto) {
         Vehiculo vehiculoExistente = buscarPorId(id);
 
         // Si la matrícula cambia, validar que la nueva no esté en uso
@@ -68,7 +68,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public void eliminar(java.util.UUID id) {
         if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("No se puede eliminar: Vehículo con ID " + id + " no encontrado");
         }
@@ -77,7 +77,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
     @Override
     @Transactional
-    public Vehiculo actualizarEstado(Long id, String nuevoEstado) {
+    public Vehiculo actualizarEstado(java.util.UUID id, String nuevoEstado) {
         Vehiculo v = buscarPorId(id);
         try {
             v.setEstado(EstadoVehiculo.valueOf(nuevoEstado.toUpperCase()));

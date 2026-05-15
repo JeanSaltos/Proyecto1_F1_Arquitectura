@@ -15,7 +15,7 @@ jobs:
   # Job 1: Build y Test del microservicio REST
   # ─────────────────────────────────────────────────────────
   build-ms-flota-rest:
-    name: "🚛 Build & Test — ms-flota-rest"
+    name: " Build & Test — ms-flota-rest"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -45,12 +45,12 @@ jobs:
   # ─────────────────────────────────────────────────────────
   # Job 2: Build y Test del microservicio SOAP
   # ─────────────────────────────────────────────────────────
-  build-ms-taller-soap:
-    name: " Build & Test — ms-taller-soap"
+  build-ms-taller-rest:
+    name: "🔧 Build & Test — ms-taller-rest"
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ms-taller-soap
+        working-directory: ms-taller-rest
 
     steps:
       - name:  Checkout del código
@@ -69,17 +69,17 @@ jobs:
       - name:  Subir artefacto JAR
         uses: actions/upload-artifact@v4
         with:
-          name: ms-taller-soap-jar
-          path: ms-taller-soap/target/*.jar
+          name: ms-taller-rest-jar
+          path: ms-taller-rest/target/*.jar
           retention-days: 5
 
   # ─────────────────────────────────────────────────────────
   # Job 3: Análisis de Calidad con SonarCloud
   # ─────────────────────────────────────────────────────────
   sonarcloud-analysis:
-    name: "🔍 Análisis SonarCloud"
+    name: " Análisis SonarCloud"
     runs-on: ubuntu-latest
-    needs: [build-ms-flota-rest, build-ms-taller-soap]
+    needs: [build-ms-flota-rest, build-ms-taller-rest]
 
     steps:
       - name:  Checkout del código
@@ -98,8 +98,8 @@ jobs:
         working-directory: ms-flota-rest
         run: mvn clean verify -B -Dspring.profiles.active=test
 
-      - name:  Build ms-taller-soap para SonarCloud
-        working-directory: ms-taller-soap
+      - name:  Build ms-taller-rest para SonarCloud
+        working-directory: ms-taller-rest
         run: mvn clean verify -B
 
       - name:  Ejecutar análisis SonarCloud — ms-flota-rest
@@ -113,13 +113,13 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
-      - name:  Ejecutar análisis SonarCloud — ms-taller-soap
-        working-directory: ms-taller-soap
+      - name:  Ejecutar análisis SonarCloud — ms-taller-rest
+        working-directory: ms-taller-rest
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn sonar:sonar \
-            -Dsonar.projectKey=logiflow_ms-taller-soap \
+            -Dsonar.projectKey=logiflow_ms-taller-rest \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
@@ -130,7 +130,7 @@ jobs:
   notify-telegram:
     name: " Notificación Telegram"
     runs-on: ubuntu-latest
-    needs: [build-ms-flota-rest, build-ms-taller-soap, sonarcloud-analysis]
+    needs: [build-ms-flota-rest, build-ms-taller-rest, sonarcloud-analysis]
     if: always()
 
     steps:
@@ -149,7 +149,7 @@ jobs:
             
              *Resultados:*
              ms-flota-rest: ${{ needs.build-ms-flota-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
-             ms-taller-soap: ${{ needs.build-ms-taller-soap.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+             ms-taller-rest: ${{ needs.build-ms-taller-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
              SonarCloud: ${{ needs.sonarcloud-analysis.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
             
              [Ver Pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})

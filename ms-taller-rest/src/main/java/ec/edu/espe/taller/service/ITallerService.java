@@ -1,7 +1,7 @@
 package ec.edu.espe.taller.service;
 
-import ec.edu.espe.taller.anticorruption.OrdenMantenimiento;
-import ec.edu.espe.taller.anticorruption.VehiculoTaller;
+import ec.edu.espe.taller.models.OrdenMantenimiento;
+import ec.edu.espe.taller.models.VehiculoTaller;
 
 /**
  * Interfaz del servicio de dominio de Taller.

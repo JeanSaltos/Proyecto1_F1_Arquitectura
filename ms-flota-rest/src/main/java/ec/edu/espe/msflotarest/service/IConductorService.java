@@ -11,7 +11,7 @@ public interface IConductorService {
     List<Conductor> listarTodos();
 
     // Buscar conductor por ID
-    Conductor buscarPorId(Long id);
+    Conductor buscarPorId(java.util.UUID id);
 
     // Buscar por cédula (Validación de identidad)
     Conductor buscarPorCedula(String cedula);
@@ -20,10 +20,10 @@ public interface IConductorService {
     Conductor registrar(ConductorDTO conductorDTO);
 
     // Actualizar información del conductor (ej. renovación de licencia)
-    Conductor actualizar(Long id, ConductorDTO conductorDTO);
+    Conductor actualizar(java.util.UUID id, ConductorDTO conductorDTO);
 
     // Dar de baja a un conductor
-    void eliminar(Long id);
+    void eliminar(java.util.UUID id);
 
     // Consultar conductores disponibles para asignación inmediata
     List<Conductor> listarDisponibles();

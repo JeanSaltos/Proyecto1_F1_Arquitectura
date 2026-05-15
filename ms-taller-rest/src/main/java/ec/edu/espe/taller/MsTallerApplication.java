@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MsTallerSoapApplication {
+public class MsTallerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MsTallerSoapApplication.class, args);
+		SpringApplication.run(MsTallerApplication.class, args);
 	}
 
 }
