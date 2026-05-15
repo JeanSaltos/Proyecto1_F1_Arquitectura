@@ -18,6 +18,7 @@
         <java.version>17</java.version>
         <sonar.organization>logiflow</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <dependencies>
@@ -80,7 +81,20 @@
     </dependencies>
 
     <build>
-        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -89,12 +103,10 @@
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
                         </exclude>
                     </excludes>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
