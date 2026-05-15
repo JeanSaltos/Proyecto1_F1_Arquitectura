@@ -15,27 +15,27 @@ jobs:
   # Job 1: Build y Test del microservicio REST
   # ─────────────────────────────────────────────────────────
   build-ms-flota-rest:
-    name: "🚛 Build & Test — ms-flota-rest"
+    name: " Build & Test — ms-flota-rest"
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ms-flota-rest
 
     steps:
-      - name: 📥 Checkout del código
+      - name:  Checkout del código
         uses: actions/checkout@v4
 
-      - name: ☕ Configurar JDK 17
+      - name:  Configurar JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
 
-      - name: 🔨 Compilar y ejecutar tests
+      - name:  Compilar y ejecutar tests
         run: mvn clean verify -B -Dspring.profiles.active=test
 
-      - name: 📦 Subir artefacto JAR
+      - name:  Subir artefacto JAR
         uses: actions/upload-artifact@v4
         with:
           name: ms-flota-rest-jar
@@ -53,20 +53,20 @@ jobs:
         working-directory: ms-taller-rest
 
     steps:
-      - name: 📥 Checkout del código
+      - name:  Checkout del código
         uses: actions/checkout@v4
 
-      - name: ☕ Configurar JDK 17
+      - name:  Configurar JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
 
-      - name: 🔨 Compilar y ejecutar tests
+      - name:  Compilar y ejecutar tests
         run: mvn clean verify -B
 
-      - name: 📦 Subir artefacto JAR
+      - name:  Subir artefacto JAR
         uses: actions/upload-artifact@v4
         with:
           name: ms-taller-rest-jar
@@ -77,32 +77,32 @@ jobs:
   # Job 3: Análisis de Calidad con SonarCloud
   # ─────────────────────────────────────────────────────────
   sonarcloud-analysis:
-    name: "🔍 Análisis SonarCloud"
+    name: " Análisis SonarCloud"
     runs-on: ubuntu-latest
     needs: [build-ms-flota-rest, build-ms-taller-rest]
 
     steps:
-      - name: 📥 Checkout del código
+      - name:  Checkout del código
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # SonarCloud necesita historial completo
 
-      - name: ☕ Configurar JDK 17
+      - name:  Configurar JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
 
-      - name: 🔨 Build ms-flota-rest para SonarCloud
+      - name:  Build ms-flota-rest para SonarCloud
         working-directory: ms-flota-rest
         run: mvn clean verify -B -Dspring.profiles.active=test
 
-      - name: 🔨 Build ms-taller-rest para SonarCloud
+      - name:  Build ms-taller-rest para SonarCloud
         working-directory: ms-taller-rest
         run: mvn clean verify -B
 
-      - name: 🔍 Ejecutar análisis SonarCloud — ms-flota-rest
+      - name:  Ejecutar análisis SonarCloud — ms-flota-rest
         working-directory: ms-flota-rest
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -113,7 +113,7 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
-      - name: 🔍 Ejecutar análisis SonarCloud — ms-taller-rest
+      - name:  Ejecutar análisis SonarCloud — ms-taller-rest
         working-directory: ms-taller-rest
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -128,28 +128,28 @@ jobs:
   # Job 4: Notificación a Telegram
   # ─────────────────────────────────────────────────────────
   notify-telegram:
-    name: "📲 Notificación Telegram"
+    name: " Notificación Telegram"
     runs-on: ubuntu-latest
     needs: [build-ms-flota-rest, build-ms-taller-rest, sonarcloud-analysis]
     if: always()
 
     steps:
-      - name: 📲 Enviar notificación a Telegram
+      - name:  Enviar notificación a Telegram
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: markdown
           message: |
-            🏗️ *LogiFlow CI Pipeline*
+             *LogiFlow CI Pipeline*
             
-            📌 *Rama:* `${{ github.ref_name }}`
-            👤 *Autor:* ${{ github.actor }}
-            📝 *Commit:* `${{ github.sha }}`
+             *Rama:* `${{ github.ref_name }}`
+             *Autor:* ${{ github.actor }}
+             *Commit:* `${{ github.sha }}`
             
-            📊 *Resultados:*
-            🚛 ms-flota-rest: ${{ needs.build-ms-flota-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
-            🔧 ms-taller-rest: ${{ needs.build-ms-taller-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
-            🔍 SonarCloud: ${{ needs.sonarcloud-analysis.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+             *Resultados:*
+             ms-flota-rest: ${{ needs.build-ms-flota-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+             ms-taller-rest: ${{ needs.build-ms-taller-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+             SonarCloud: ${{ needs.sonarcloud-analysis.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
             
-            🔗 [Ver Pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+             [Ver Pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
