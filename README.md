@@ -15,11 +15,11 @@
 │                   LogiFlow                       │
 │                                                  │
 │  ┌──────────────────┐  ┌──────────────────────┐ │
-│  │  ms-flota-rest   │  │   ms-taller-soap     │ │
-│  │  (REST / JSON)   │  │   (SOAP / XML)       │ │
+│  │  ms-flota-rest   │  │   ms-taller-rest     │ │
+│  │  (REST / JSON)   │  │   (REST / JSON)      │ │
 │  │                  │  │                      │ │
-│  │  • CRUD Vehículos│  │  • consultarVehiculo │ │
-│  │  • CRUD Conduct. │  │  • registrarOrden    │ │
+│  │  • CRUD Vehículos│  │  • GET vehiculo      │ │
+│  │  • CRUD Conduct. │  │  • POST mantenim.    │ │
 │  │  • Disponibilidad│  │  • Capa Anticorrup.  │ │
 │  │                  │  │                      │ │
 │  │  Puerto: 8081    │  │  Puerto: 8082        │ │
@@ -43,10 +43,9 @@
 | Framework           | Spring Boot 3.2.5                 |
 | Build Tool          | Apache Maven                      |
 | REST API            | Spring Web + Bean Validation      |
-| SOAP API            | Spring Web Services + JAXB        |
+| Documentación REST  | SpringDoc OpenAPI (Swagger UI)    |
 | Base de Datos       | PostgreSQL (prod) / H2 (test)     |
 | Documentación REST  | SpringDoc OpenAPI (Swagger UI)    |
-| Documentación SOAP  | WSDL auto-generado                |
 | CI/CD               | GitHub Actions                    |
 | Análisis de Calidad | SonarCloud                        |
 | Notificaciones      | Telegram Bot API                  |
@@ -70,7 +69,7 @@
 CREATE DATABASE logiflow_flota;
 ```
 
-> **Nota:** El microservicio `ms-taller-soap` no requiere base de datos; usa un repositorio en memoria.
+> **Nota:** El microservicio `ms-taller-rest` no requiere base de datos; usa un repositorio en memoria.
 
 ### 2. Ejecutar ms-flota-rest (REST)
 
@@ -85,17 +84,17 @@ mvn spring-boot:run
 - Swagger UI: `http://localhost:8081/swagger-ui.html`
 - OpenAPI JSON: `http://localhost:8081/api-docs`
 
-### 3. Ejecutar ms-taller-soap (SOAP)
+### 3. Ejecutar ms-taller-rest (REST)
 
 ```bash
-cd ms-taller-soap
+cd ms-taller-rest
 mvn clean compile
 mvn spring-boot:run
 ```
 
 **Endpoints disponibles:**
-- WSDL: `http://localhost:8082/ws/taller.wsdl`
-- Endpoint SOAP: `http://localhost:8082/ws`
+- API REST: `http://localhost:8082/api/taller/vehiculos/{matricula}` y `http://localhost:8082/api/taller/mantenimientos`
+- Swagger UI: `http://localhost:8082/swagger-ui.html`
 
 ### 4. Ejecutar Tests
 
@@ -104,8 +103,8 @@ mvn spring-boot:run
 cd ms-flota-rest
 mvn test
 
-# ms-taller-soap
-cd ms-taller-soap
+# ms-taller-rest
+cd ms-taller-rest
 mvn test
 ```
 
@@ -120,7 +119,7 @@ El pipeline se ejecuta automáticamente en pushes y PRs a las ramas `main` y `de
 | Job                     | Descripción                                          |
 |-------------------------|------------------------------------------------------|
 | `build-ms-flota-rest`   | Compila y ejecuta tests del microservicio REST       |
-| `build-ms-taller-soap`  | Compila y ejecuta tests del microservicio SOAP       |
+| `build-ms-taller-rest`  | Compila y ejecuta tests del microservicio REST       |
 | `sonarcloud-analysis`   | Analiza calidad de código con SonarCloud             |
 | `notify-telegram`       | Envía resultados del build a un grupo de Telegram    |
 
@@ -189,18 +188,17 @@ ProyectoP1/
 │           └── impl/
 │               ├── VehiculoServiceImpl.java
 │               └── ConductorServiceImpl.java
-├── ms-taller-soap/                   # Bounded Context: Taller Externo (ACL)
+├── ms-taller-rest/                   # Bounded Context: Taller Externo (ACL)
 │   ├── pom.xml
 │   └── src/main/java/ec/edu/espe/taller/
-│       ├── MsTallerSoapApplication.java
-│       ├── anticorruption/           # ← Capa Anticorrupción (DDD)
+│       ├── MsTallerApplication.java
+│       ├── controllers/
+│       │   └── TallerController.java
+│       ├── dtos/
+│       │   └── MantenimientoDTO.java
+│       ├── models/                   # ← Capa Anticorrupción / Modelo interno
 │       │   ├── VehiculoTaller.java
-│       │   ├── OrdenMantenimiento.java
-│       │   └── TallerTranslator.java
-│       ├── config/
-│       │   └── WebServiceConfig.java
-│       ├── endpoint/
-│       │   └── TallerEndpoint.java
+│       │   └── OrdenMantenimiento.java
 │       ├── repository/
 │       │   └── TallerRepository.java
 │       └── service/

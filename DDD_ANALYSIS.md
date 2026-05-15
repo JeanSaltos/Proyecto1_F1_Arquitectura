@@ -127,8 +127,8 @@ graph LR
 | **Responsabilidad** | Gestión de órdenes de mantenimiento. Integración con taller externo.|
 | **Entidades**     | `OrdenMantenimiento`, `VehiculoTaller`                                |
 | **Patrón DDD**    | **Anti-Corruption Layer** (Capa Anticorrupción)                       |
-| **Protocolo**     | SOAP (XML/WSDL)                                                       |
-| **Estado Fase 1** | ✅ **Implementado** — `ms-taller-soap`                                |
+| **Protocolo**     | REST (JSON)                                                           |
+| **Estado Fase 1** | ✅ **Implementado** — `ms-taller-rest`                                |
 
 ### BC-03: Ruteo y Optimización (Routing & Optimization)
 
@@ -229,10 +229,10 @@ El Lenguaje Ubicuo garantiza que desarrolladores, stakeholders y documentación 
 | Término                      | Definición                                                                          | Uso en Código                        |
 |------------------------------|------------------------------------------------------------------------------------|--------------------------------------|
 | **Orden de Mantenimiento**   | Registro formal de una incidencia o servicio preventivo sobre un vehículo.         | `OrdenMantenimiento.java`            |
-| **Taller Externo**           | Proveedor de servicios de mantenimiento que opera fuera del dominio de LogiFlow.   | Integración SOAP                     |
-| **Capa Anticorrupción (ACL)**| Patrón DDD que traduce y aísla el modelo interno del contrato del taller externo.  | `TallerTranslator.java`             |
-| **Consultar Vehículo**       | Operación SOAP que permite al taller obtener datos de un vehículo por matrícula.   | `consultarVehiculo` (WSDL)           |
-| **Registrar Orden**          | Operación SOAP para crear una nueva orden de mantenimiento.                        | `registrarOrdenMantenimiento` (WSDL) |
+| **Taller Externo**           | Proveedor de servicios de mantenimiento que opera fuera del dominio de LogiFlow.   | Integración REST                     |
+| **Capa Anticorrupción (ACL)**| Patrón DDD que traduce y aísla el modelo interno del contrato del taller externo.  | `TallerTranslator.java` / `TallerServiceImpl` |
+| **Consultar Vehículo**       | Operación REST que permite al taller obtener datos de un vehículo por matrícula.   | `GET /vehiculos/{matricula}`         |
+| **Registrar Orden**          | Operación REST para crear una nueva orden de mantenimiento.                        | `POST /mantenimientos`               |
 
 #### Contexto: Ruteo y Despacho (Fase 2)
 
@@ -260,7 +260,7 @@ graph TB
 
     subgraph Support["🔷 Supporting Domains"]
         BC01["BC-01<br/>Gestión de Flota<br/>✅ ms-flota-rest"]
-        BC02["BC-02<br/>Taller y Mantenimiento<br/>✅ ms-taller-soap"]
+        BC02["BC-02<br/>Taller y Mantenimiento<br/>✅ ms-taller-rest"]
         BC05["BC-05<br/>Gestión de Envíos"]
         BC06["BC-06<br/>Rastreo y Monitoreo"]
     end
@@ -292,7 +292,7 @@ graph TB
 | Relación                      | Entre BCs                        | Descripción                                                          |
 |-------------------------------|----------------------------------|----------------------------------------------------------------------|
 | **Upstream/Downstream (U/D)** | Flota → Despacho                 | Flota provee datos de vehículos/conductores que Despacho consume.    |
-| **Anti-Corruption Layer (ACL)** | Taller ↔ Flota                 | Taller traduce el modelo externo SOAP al modelo interno de Flota.    |
+| **Anti-Corruption Layer (ACL)** | Taller ↔ Flota                 | Taller aísla su modelo interno del esquema REST externo.             |
 | **Open Host Service (OHS)**   | Usuarios → Flota, Despacho      | Usuarios expone una API estándar de autenticación para todos.        |
 | **Published Language (PL)**   | Usuarios → Flota                 | Se usa JWT como lenguaje compartido de autenticación.                |
 | **Conformist**                | Reportes ← Flota, Envíos        | Reportes se adapta al modelo de datos de otros BCs (solo lectura).   |
@@ -310,6 +310,6 @@ graph TB
 | Lenguaje Ubicuo                  | ✅ Completo | 3 contextos documentados con uso en código         |
 | Context Map                      | ✅ Completo | Diagrama Mermaid con 6 tipos de relaciones         |
 | ms-flota-rest (REST)             | ✅ Completo | CRUD + Disponibilidad + Swagger                    |
-| ms-taller-soap (SOAP + ACL)     | ✅ Completo | 2 operaciones + WSDL + Capa Anticorrupción         |
+| ms-taller-rest (REST + ACL)      | ✅ Completo | 2 endpoints REST + Swagger + Capa Anticorrupción   |
 | Pipeline CI/CD                   | ✅ Completo | GitHub Actions + SonarCloud + Telegram             |
 | README con instrucciones         | ✅ Completo | Ejecución local + configuración de secretos        |
