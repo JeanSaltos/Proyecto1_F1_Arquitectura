@@ -1,10 +1,10 @@
-# 🚚 LogiFlow — Plataforma de Gestión Logística
+# LogiFlow — Plataforma de Gestión Logística
 
 > **Fase 1** — Fundación de Microservicios con DDD, REST, SOAP y CI/CD
 
 ---
 
-## 📋 Descripción del Proyecto
+## Descripción del Proyecto
 
 **LogiFlow** es una plataforma de gestión logística diseñada bajo los principios de **Domain-Driven Design (DDD)** y **arquitectura de microservicios**. El proyecto nace como respuesta a la problemática de un monolito heredado que dificulta la escalabilidad, mantenibilidad y evolución independiente de los dominios de negocio.
 
@@ -35,7 +35,7 @@
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
 | Componente          | Tecnología                        |
 |---------------------|-----------------------------------|
@@ -54,7 +54,7 @@
 
 ---
 
-## 🚀 Instrucciones de Ejecución Local
+## Instrucciones de Ejecución Local
 
 ### Prerrequisitos
 
@@ -110,7 +110,7 @@ mvn test
 
 ---
 
-## 🔄 Pipeline CI/CD (GitHub Actions)
+## Pipeline CI/CD (GitHub Actions)
 
 El pipeline se ejecuta automáticamente en pushes y PRs a las ramas `main` y `development`.
 
@@ -150,7 +150,7 @@ Para que el pipeline funcione correctamente, configura los siguientes secretos e
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 ProyectoP1/
@@ -213,7 +213,7 @@ ProyectoP1/
 
 ---
 
-## 📚 Documentación Adicional
+## Documentación Adicional
 
 | Documento                                      | Contenido                                            |
 |------------------------------------------------|------------------------------------------------------|
@@ -222,14 +222,15 @@ ProyectoP1/
 
 ---
 
-## 👥 Equipo
+## Equipo
 
 - **Universidad:** Universidad de las Fuerzas Armadas — ESPE
+- - **Integrantes:** Jean Saltos y Tupac Velasquez
 - **Asignatura:** Arquitectura de Software
 - **Fase:** 1 — Fundación de Microservicios
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 Proyecto de uso exclusivamente académico.
