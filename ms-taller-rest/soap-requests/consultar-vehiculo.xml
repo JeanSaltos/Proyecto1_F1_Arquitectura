@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ws="http://espe.edu.ec/taller/ws">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ws:consultarVehiculoRequest>
+         <ws:matricula>PBC1234</ws:matricula>
+      </ws:consultarVehiculoRequest>
+   </soapenv:Body>
+</soapenv:Envelope>

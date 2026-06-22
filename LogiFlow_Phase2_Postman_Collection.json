@@ -1,0 +1,577 @@
+{
+  "info": {
+    "_postman_id": "8bf73d2a-fa13-4122-80ba-3b02c8eb12ab",
+    "name": "LogiFlow Phase 2 - Integration Testing",
+    "description": "Colección de solicitudes Postman para probar de extremo a extremo los microservicios de LogiFlow Fase 2. Incluye Autenticación, Clientes, Flota, Pedidos, Ruteo y Gateway GraphQL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Autenticación (ms-auth :8083)",
+      "item": [
+        {
+          "name": "Registrar Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"operador1\",\n  \"password\": \"password123\",\n  \"rol\": \"OPERADOR\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"auth_token\", jsonData.token);",
+                  "    console.log(\"Token guardado:\", jsonData.token);",
+                  "}"
+                ],
+                "type": "javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"operador1\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Clientes y Cuentas (ms-clientes :8084)",
+      "item": [
+        {
+          "name": "Crear Cliente Corporativo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"cliente_id\", jsonData.id);",
+                  "}"
+                ],
+                "type": "javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Corporacion Favorita S.A.\",\n  \"email\": \"contacto@favorita.com.ec\",\n  \"telefono\": \"0991112222\",\n  \"tipo\": \"CORPORATIVO\",\n  \"identificacion\": \"1790000001001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8084/api/clientes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8084",
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Cuenta Corporativa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"{{cliente_id}}\",\n  \"saldo\": 1000.00,\n  \"limiteCredito\": 300.00\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8084/api/clientes/cuentas",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8084",
+              "path": [
+                "api",
+                "clientes",
+                "cuentas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Flota de Vehículos (ms-flota-rest :8081)",
+      "item": [
+        {
+          "name": "Crear Vehículo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"vehiculo_id\", jsonData.id);",
+                  "}"
+                ],
+                "type": "javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"PDF-9876\",\n  \"tipo\": \"CAMION\",\n  \"capacidad\": 2500.0,\n  \"estado\": \"DISPONIBLE\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8081/api/vehiculos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "vehiculos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Conductor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"conductor_id\", jsonData.id);",
+                  "}"
+                ],
+                "type": "javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cedula\": \"1722222222\",\n  \"nombre\": \"Carlos Perez\",\n  \"licencia\": \"Tipo E\",\n  \"disponible\": true\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8081/api/conductores",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "conductores"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Vehículos Disponibles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/api/vehiculos/disponibles",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "vehiculos",
+                "disponibles"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Pedidos (ms-pedidos :8085)",
+      "item": [
+        {
+          "name": "Crear Pedido (Dispara RabbitMQ)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"pedido_id\", jsonData.id);",
+                  "}"
+                ],
+                "type": "javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"{{cliente_id}}\",\n  \"descripcion\": \"Carga de alimentos no perecibles\",\n  \"peso\": 450.0,\n  \"origen\": \"Quito\",\n  \"destino\": \"Guayaquil\",\n  \"prioridad\": \"ALTA\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8085/api/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8085",
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Pedido por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8085/api/pedidos/{{pedido_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8085",
+              "path": [
+                "api",
+                "pedidos",
+                "{{pedido_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Enrutamiento y GPS (ms-ruteo :8086)",
+      "item": [
+        {
+          "name": "Obtener Envíos Registrados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8086/api/ruteo/envios",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8086",
+              "path": [
+                "api",
+                "ruteo",
+                "envios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Envío de un Pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"envio_id\", jsonData.id);",
+                  "}"
+                ],
+                "type": "javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8086/api/ruteo/envios/pedido/{{pedido_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8086",
+              "path": [
+                "api",
+                "ruteo",
+                "envios",
+                "pedido",
+                "{{pedido_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Simular Coordenadas GPS (WebSocket push)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8086/api/ruteo/envios/{{envio_id}}/simular?lat=-0.229&lng=-78.524&velocidad=72.5",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8086",
+              "path": [
+                "api",
+                "ruteo",
+                "envios",
+                "{{envio_id}}",
+                "simular"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "-0.229"
+                },
+                {
+                  "key": "lng",
+                  "value": "-78.524"
+                },
+                {
+                  "key": "velocidad",
+                  "value": "72.5"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. GraphQL Gateway (:8080)",
+      "item": [
+        {
+          "name": "Crear Pedido (GraphQL Mutation)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CrearNuevoPedido($clienteId: ID!) {\n  crearPedido(input: {\n    clienteId: $clienteId\n    descripcion: \"Carga de insumos medicos\"\n    peso: 75.8\n    origen: \"Quito\"\n    destino: \"Guayaquil\"\n    prioridad: ALTA\n  }) {\n    id\n    estado\n    prioridad\n  }\n}",
+                "variables": "{\n  \"clienteId\": \"{{cliente_id}}\"\n}"
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Detalle de Envío (GraphQL Query)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ConsultarEnvio($envioId: ID!) {\n  envio(id: $envioId) {\n    id\n    ruta\n    estado\n    kms\n    eta\n  }\n}",
+                "variables": "{\n  \"envioId\": \"{{envio_id}}\"\n}"
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "cliente_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pedido_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "vehiculo_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "conductor_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "envio_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,310 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-flota-rest
+spec:
+  ports:
+    - port: 8081
+      targetPort: 8081
+  selector:
+    app: ms-flota-rest
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-flota-rest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-flota-rest
+  template:
+    metadata:
+      labels:
+        app: ms-flota-rest
+    spec:
+      containers:
+        - name: ms-flota-rest
+          image: logiflow/ms-flota-rest:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/logiflow_flota
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+          ports:
+            - containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-taller-rest
+spec:
+  ports:
+    - port: 8082
+      targetPort: 8082
+  selector:
+    app: ms-taller-rest
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-taller-rest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-taller-rest
+  template:
+    metadata:
+      labels:
+        app: ms-taller-rest
+    spec:
+      containers:
+        - name: ms-taller-rest
+          image: logiflow/ms-taller-rest:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-auth
+spec:
+  ports:
+    - port: 8083
+      targetPort: 8083
+  selector:
+    app: ms-auth
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-auth
+  template:
+    metadata:
+      labels:
+        app: ms-auth
+    spec:
+      containers:
+        - name: ms-auth
+          image: logiflow/ms-auth:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/logiflow_auth
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+          ports:
+            - containerPort: 8083
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-clientes
+spec:
+  ports:
+    - port: 8084
+      targetPort: 8084
+  selector:
+    app: ms-clientes
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-clientes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-clientes
+  template:
+    metadata:
+      labels:
+        app: ms-clientes
+    spec:
+      containers:
+        - name: ms-clientes
+          image: logiflow/ms-clientes:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/logiflow_clientes
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+          ports:
+            - containerPort: 8084
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-pedidos
+spec:
+  ports:
+    - port: 8085
+      targetPort: 8085
+  selector:
+    app: ms-pedidos
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-pedidos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-pedidos
+  template:
+    metadata:
+      labels:
+        app: ms-pedidos
+    spec:
+      containers:
+        - name: ms-pedidos
+          image: logiflow/ms-pedidos:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/logiflow_pedidos
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: CLIENTES_SERVICE_URL
+              value: http://ms-clientes:8084
+          ports:
+            - containerPort: 8085
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-ruteo
+spec:
+  ports:
+    - port: 8086
+      targetPort: 8086
+  selector:
+    app: ms-ruteo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-ruteo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-ruteo
+  template:
+    metadata:
+      labels:
+        app: ms-ruteo
+    spec:
+      containers:
+        - name: ms-ruteo
+          image: logiflow/ms-ruteo:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/logiflow_ruteo
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: FLOTA_SERVICE_URL
+              value: http://ms-flota-rest:8081
+            - name: PEDIDOS_SERVICE_URL
+              value: http://ms-pedidos:8085
+          ports:
+            - containerPort: 8086
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-seguimiento
+spec:
+  ports:
+    - port: 8087
+      targetPort: 8087
+  selector:
+    app: ms-seguimiento
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-seguimiento
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-seguimiento
+  template:
+    metadata:
+      labels:
+        app: ms-seguimiento
+    spec:
+      containers:
+        - name: ms-seguimiento
+          image: logiflow/ms-seguimiento:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+          ports:
+            - containerPort: 8087
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graphql-gateway
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: graphql-gateway
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graphql-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: graphql-gateway
+  template:
+    metadata:
+      labels:
+        app: graphql-gateway
+    spec:
+      containers:
+        - name: graphql-gateway
+          image: logiflow/graphql-gateway:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: PEDIDOS_SERVICE_URL
+              value: http://ms-pedidos:8085
+            - name: RUTEO_SERVICE_URL
+              value: http://ms-ruteo:8086
+          ports:
+            - containerPort: 8080

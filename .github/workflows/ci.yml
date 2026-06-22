@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════════
-# LogiFlow — Pipeline CI/CD (Fase 1)
+# LogiFlow — Pipeline CI/CD (Fase 2)
 # Ejecuta build, test, análisis de calidad y notificaciones
 # ═══════════════════════════════════════════════════════════════════════
 name: LogiFlow CI Pipeline
@@ -12,38 +12,28 @@ on:
 
 jobs:
   # ─────────────────────────────────────────────────────────
-  # Job 1: Build y Test del microservicio REST
+  # Job 1: ms-flota-rest
   # ─────────────────────────────────────────────────────────
   build-ms-flota-rest:
-    name: " Build & Test — ms-flota-rest"
+    name: "🚗 Build & Test — ms-flota-rest"
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ms-flota-rest
-
     steps:
-      - name:  Checkout del código
+      - name: Checkout del código
         uses: actions/checkout@v4
-
-      - name:  Configurar JDK 17
+      - name: Configurar JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-
-      - name:  Compilar y ejecutar tests
+      - name: Compilar y ejecutar tests
         run: mvn clean verify -B -Dspring.profiles.active=test
 
-      - name:  Subir artefacto JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: ms-flota-rest-jar
-          path: ms-flota-rest/target/*.jar
-          retention-days: 5
-
   # ─────────────────────────────────────────────────────────
-  # Job 2: Build y Test del microservicio SOAP
+  # Job 2: ms-taller-rest
   # ─────────────────────────────────────────────────────────
   build-ms-taller-rest:
     name: "🔧 Build & Test — ms-taller-rest"
@@ -51,105 +41,293 @@ jobs:
     defaults:
       run:
         working-directory: ms-taller-rest
-
     steps:
-      - name:  Checkout del código
+      - name: Checkout del código
         uses: actions/checkout@v4
-
-      - name:  Configurar JDK 17
+      - name: Configurar JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-
-      - name:  Compilar y ejecutar tests
+      - name: Compilar y ejecutar tests
         run: mvn clean verify -B
 
-      - name:  Subir artefacto JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: ms-taller-rest-jar
-          path: ms-taller-rest/target/*.jar
-          retention-days: 5
-
   # ─────────────────────────────────────────────────────────
-  # Job 3: Análisis de Calidad con SonarCloud
+  # Job 3: ms-auth
   # ─────────────────────────────────────────────────────────
-  sonarcloud-analysis:
-    name: " Análisis SonarCloud"
+  build-ms-auth:
+    name: "🔑 Build & Test — ms-auth"
     runs-on: ubuntu-latest
-    needs: [build-ms-flota-rest, build-ms-taller-rest]
-
+    defaults:
+      run:
+        working-directory: ms-auth
     steps:
-      - name:  Checkout del código
+      - name: Checkout del código
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # SonarCloud necesita historial completo
-
-      - name:  Configurar JDK 17
+      - name: Configurar JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-
-      - name:  Build ms-flota-rest para SonarCloud
-        working-directory: ms-flota-rest
+      - name: Compilar y ejecutar tests
         run: mvn clean verify -B -Dspring.profiles.active=test
 
-      - name:  Build ms-taller-rest para SonarCloud
-        working-directory: ms-taller-rest
-        run: mvn clean verify -B
+  # ─────────────────────────────────────────────────────────
+  # Job 4: ms-clientes
+  # ─────────────────────────────────────────────────────────
+  build-ms-clientes:
+    name: "👥 Build & Test — ms-clientes"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ms-clientes
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Compilar y ejecutar tests
+        run: mvn clean verify -B -Dspring.profiles.active=test
 
-      - name:  Ejecutar análisis SonarCloud — ms-flota-rest
+  # ─────────────────────────────────────────────────────────
+  # Job 5: ms-pedidos
+  # ─────────────────────────────────────────────────────────
+  build-ms-pedidos:
+    name: "📦 Build & Test — ms-pedidos"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ms-pedidos
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Compilar y ejecutar tests
+        run: mvn clean verify -B -Dspring.profiles.active=test
+
+  # ─────────────────────────────────────────────────────────
+  # Job 6: ms-ruteo
+  # ─────────────────────────────────────────────────────────
+  build-ms-ruteo:
+    name: "🗺️ Build & Test — ms-ruteo"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ms-ruteo
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Compilar y ejecutar tests
+        run: mvn clean verify -B -Dspring.profiles.active=test
+
+  # ─────────────────────────────────────────────────────────
+  # Job 7: ms-seguimiento
+  # ─────────────────────────────────────────────────────────
+  build-ms-seguimiento:
+    name: "📡 Build & Test — ms-seguimiento"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ms-seguimiento
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Compilar y ejecutar tests
+        run: mvn clean verify -B -Dspring.profiles.active=test
+
+  # ─────────────────────────────────────────────────────────
+  # Job 8: graphql-gateway
+  # ─────────────────────────────────────────────────────────
+  build-graphql-gateway:
+    name: "⚡ Build & Test — graphql-gateway"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: graphql-gateway
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Compilar y ejecutar tests
+        run: mvn clean verify -B -Dspring.profiles.active=test
+
+  # ─────────────────────────────────────────────────────────
+  # Job 9: Análisis de Calidad con SonarCloud
+  # ─────────────────────────────────────────────────────────
+  sonarcloud-analysis:
+    name: "📊 Análisis SonarCloud"
+    runs-on: ubuntu-latest
+    needs:
+      - build-ms-flota-rest
+      - build-ms-taller-rest
+      - build-ms-auth
+      - build-ms-clientes
+      - build-ms-pedidos
+      - build-ms-ruteo
+      - build-ms-seguimiento
+      - build-graphql-gateway
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # Análisis de ms-flota-rest
+      - name: Analizar ms-flota-rest
         working-directory: ms-flota-rest
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn sonar:sonar \
+          mvn clean verify sonar:sonar -B -Dspring.profiles.active=test \
             -Dsonar.projectKey=logiflow_ms-flota-rest \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
-      - name:  Ejecutar análisis SonarCloud — ms-taller-rest
+      # Análisis de ms-taller-rest
+      - name: Analizar ms-taller-rest
         working-directory: ms-taller-rest
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn sonar:sonar \
+          mvn clean verify sonar:sonar -B \
             -Dsonar.projectKey=logiflow_ms-taller-rest \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
+      # Análisis de ms-auth
+      - name: Analizar ms-auth
+        working-directory: ms-auth
+        run: |
+          mvn clean verify sonar:sonar -B -Dspring.profiles.active=test \
+            -Dsonar.projectKey=logiflow_ms-auth \
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
+      # Análisis de ms-clientes
+      - name: Analizar ms-clientes
+        working-directory: ms-clientes
+        run: |
+          mvn clean verify sonar:sonar -B -Dspring.profiles.active=test \
+            -Dsonar.projectKey=logiflow_ms-clientes \
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
+      # Análisis de ms-pedidos
+      - name: Analizar ms-pedidos
+        working-directory: ms-pedidos
+        run: |
+          mvn clean verify sonar:sonar -B -Dspring.profiles.active=test \
+            -Dsonar.projectKey=logiflow_ms-pedidos \
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
+      # Análisis de ms-ruteo
+      - name: Analizar ms-ruteo
+        working-directory: ms-ruteo
+        run: |
+          mvn clean verify sonar:sonar -B -Dspring.profiles.active=test \
+            -Dsonar.projectKey=logiflow_ms-ruteo \
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
+      # Análisis de ms-seguimiento
+      - name: Analizar ms-seguimiento
+        working-directory: ms-seguimiento
+        run: |
+          mvn clean verify sonar:sonar -B -Dspring.profiles.active=test \
+            -Dsonar.projectKey=logiflow_ms-seguimiento \
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
+      # Análisis de graphql-gateway
+      - name: Analizar graphql-gateway
+        working-directory: graphql-gateway
+        run: |
+          mvn clean verify sonar:sonar -B -Dspring.profiles.active=test \
+            -Dsonar.projectKey=logiflow_graphql-gateway \
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
   # ─────────────────────────────────────────────────────────
-  # Job 4: Notificación a Telegram
+  # Job 10: Notificación a Telegram
   # ─────────────────────────────────────────────────────────
   notify-telegram:
-    name: " Notificación Telegram"
+    name: "📢 Notificación Telegram"
     runs-on: ubuntu-latest
-    needs: [build-ms-flota-rest, build-ms-taller-rest, sonarcloud-analysis]
+    needs:
+      - build-ms-flota-rest
+      - build-ms-taller-rest
+      - build-ms-auth
+      - build-ms-clientes
+      - build-ms-pedidos
+      - build-ms-ruteo
+      - build-ms-seguimiento
+      - build-graphql-gateway
+      - sonarcloud-analysis
     if: always()
-
     steps:
-      - name:  Enviar notificación a Telegram
+      - name: Enviar notificación a Telegram
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: markdown
           message: |
-             *LogiFlow CI Pipeline*
+            *🚀 LogiFlow CI Pipeline - Fase 2*
+
+            *Rama:* `${{ github.ref_name }}`
+            *Autor:* ${{ github.actor }}
+            *Commit:* `${{ github.sha }}`
             
-             *Rama:* `${{ github.ref_name }}`
-             *Autor:* ${{ github.actor }}
-             *Commit:* `${{ github.sha }}`
+            *Resultados del Build:*
+            🚗 ms-flota-rest: ${{ needs.build-ms-flota-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+            🔧 ms-taller-rest: ${{ needs.build-ms-taller-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+            🔑 ms-auth: ${{ needs.build-ms-auth.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+            👥 ms-clientes: ${{ needs.build-ms-clientes.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+            📦 ms-pedidos: ${{ needs.build-ms-pedidos.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+            🗺️ ms-ruteo: ${{ needs.build-ms-ruteo.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+            📡 ms-seguimiento: ${{ needs.build-ms-seguimiento.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+            ⚡ graphql-gateway: ${{ needs.build-graphql-gateway.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
             
-             *Resultados:*
-             ms-flota-rest: ${{ needs.build-ms-flota-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
-             ms-taller-rest: ${{ needs.build-ms-taller-rest.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
-             SonarCloud: ${{ needs.sonarcloud-analysis.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
+            *Calidad de Código:*
+            📊 SonarCloud: ${{ needs.sonarcloud-analysis.result == 'success' && '✅ Éxito' || '❌ Fallo' }}
             
-             [Ver Pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            [Ver detalles en GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})

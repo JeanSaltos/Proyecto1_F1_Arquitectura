@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ws="http://espe.edu.ec/taller/ws">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ws:registrarOrdenMantenimientoRequest>
+         <ws:matricula>PBC1234</ws:matricula>
+         <ws:descripcion>Cambio de aceite y revision de frenos</ws:descripcion>
+      </ws:registrarOrdenMantenimientoRequest>
+   </soapenv:Body>
+</soapenv:Envelope>

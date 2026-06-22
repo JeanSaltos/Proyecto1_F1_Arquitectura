@@ -1,0 +1,56 @@
+type Query {
+    pedidosActivos(clienteId: ID!): [Pedido!]!
+    envio(id: ID!): Envio
+}
+
+type Mutation {
+    crearPedido(input: PedidoInput!): Pedido
+    cancelarPedido(id: ID!): Pedido
+}
+
+type Subscription {
+    tracking(envioId: ID!): Posicion
+}
+
+type Pedido {
+    id: ID!
+    clienteId: ID!
+    descripcion: String!
+    peso: Float!
+    origen: String!
+    destino: String!
+    estado: String!
+    prioridad: String!
+    fechaCreacion: String!
+}
+
+input PedidoInput {
+    clienteId: ID!
+    descripcion: String!
+    peso: Float!
+    origen: String!
+    destino: String!
+    prioridad: String!
+}
+
+type Envio {
+    id: ID!
+    pedidoId: ID!
+    vehiculoId: ID!
+    conductorId: ID!
+    ruta: String!
+    estado: String!
+    kms: Float!
+    eta: String!
+    fechaAsignacion: String!
+    ultimaPosicion: Posicion
+}
+
+type Posicion {
+    envioId: ID!
+    lat: Float!
+    lng: Float!
+    velocidad: Float!
+    eta: String!
+    timestamp: String!
+}

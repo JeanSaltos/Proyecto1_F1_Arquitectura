@@ -1,0 +1,75 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: logiflow-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Permite conexiones persistentes para WebSockets
+    nginx.ingress.kubernetes.io/websocket-services: "ms-seguimiento,graphql-gateway"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-auth
+                port:
+                  number: 8083
+          - path: /api/clientes
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-clientes
+                port:
+                  number: 8084
+          - path: /api/pedidos
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-pedidos
+                port:
+                  number: 8085
+          - path: /api/ruteo
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-ruteo
+                port:
+                  number: 8086
+          - path: /api/vehiculos
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-flota-rest
+                port:
+                  number: 8081
+          - path: /api/conductores
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-flota-rest
+                port:
+                  number: 8081
+          - path: /api/taller
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-taller-rest
+                port:
+                  number: 8082
+          - path: /graphql
+            pathType: Prefix
+            backend:
+              service:
+                name: graphql-gateway
+                port:
+                  number: 8080
+          - path: /ws/seguimiento
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-seguimiento
+                port:
+                  number: 8087

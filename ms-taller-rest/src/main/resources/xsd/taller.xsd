@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://espe.edu.ec/taller/ws"
+           targetNamespace="http://espe.edu.ec/taller/ws"
+           elementFormDefault="qualified">
+
+    <xs:element name="consultarVehiculoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="matricula" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="consultarVehiculoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="vehiculo" type="tns:vehiculoType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="registrarOrdenMantenimientoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="matricula" type="xs:string"/>
+                <xs:element name="descripcion" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="registrarOrdenMantenimientoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="idOrden" type="xs:string"/>
+                <xs:element name="matricula" type="xs:string"/>
+                <xs:element name="estado" type="xs:string"/>
+                <xs:element name="fechaRegistro" type="xs:string"/>
+                <xs:element name="mensaje" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="vehiculoType">
+        <xs:sequence>
+            <xs:element name="matricula" type="xs:string"/>
+            <xs:element name="marca" type="xs:string"/>
+            <xs:element name="modelo" type="xs:string"/>
+            <xs:element name="anio" type="xs:int"/>
+            <xs:element name="estadoMantenimiento" type="xs:string"/>
+            <xs:element name="encontrado" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

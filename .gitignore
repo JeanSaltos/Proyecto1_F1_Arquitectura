@@ -35,5 +35,12 @@ logs/
 
 # ── Environment / Secrets ──
 .env
+.env.*
+!.env.example
 *.env
 application-local.properties
+application-*.local.properties
+*.pem
+*.key
+*.p12
+*.jks
