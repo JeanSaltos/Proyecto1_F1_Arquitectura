@@ -1,112 +1,155 @@
-# 🎙️ Guion de Exposición Detallado: Proyecto LogiFlow (Evaluación 20/20)
+# 🎙️ Guion de Exposición Detallado: LogiFlow - Fase 2 (Evaluación 20/20)
 
-Este guion está estructurado con un alto nivel de detalle técnico.
-**Estudiante 1:** Encargado de Entregables 1 y 2.
-**Estudiante 2 (Tú):** Encargado de Entregables 3 y 4.
-
-> [!IMPORTANT]
-> **Preparación previa:**
-> 1. Levantar PostgreSQL.
-> 2. Levantar `ms-flota-rest` (puerto 8081).
-> 3. Levantar `ms-taller-rest` (puerto 8082).
-> 4. Tener abierto el IDE con los controladores visibles.
-> 5. Tener listas las pestañas del navegador: `DDD_ANALYSIS.md`, Swagger Flota, Swagger Taller, GitHub (pestaña Actions), SonarCloud y Telegram Web.
+Este guion está estructurado detalladamente para **dos personas**, enfocándose exclusivamente en la **Fase 2**: Backend Distribuido, Integración con RabbitMQ, Gateway GraphQL, WebSockets, Contenedores Docker, Despliegue en Kubernetes y Calidad con SonarCloud.
 
 ---
 
-## 🗣️ Introducción (Estudiante 1)
-**"Buenos días, ingeniero. Presentamos la Fase 1 de la Plataforma de Gestión Logística, LogiFlow. Para una evaluación ágil, nuestra exposición seguirá exactamente los 4 entregables de su rúbrica, demostrando en código y documentación el cumplimiento de cada punto."**
+### 📋 Preparación Previa a la Defensa:
+1. **Entorno Activo**: Asegúrate de tener el clúster de Kubernetes corriendo (`kubectl get pods` debe mostrar los 10 pods: 8 microservicios + postgres + rabbitmq en estado `Running`).
+2. **Herramientas Abiertas**:
+   - IDE (IntelliJ / VS Code) con las pestañas de los microservicios clave abiertos (`ms-pedidos`, `ms-ruteo`, `graphql-gateway`).
+   - Navegador web con:
+     - **GraphiQL**: `http://localhost:8080/graphiql` (GraphQL Gateway)
+     - **RabbitMQ Management**: `http://localhost:15672` (guest/guest)
+     - **SonarCloud Dashboard** de tu cuenta.
+     - **Archivo `README.md`** y **`k8s/microservices.yaml`** listos.
 
 ---
 
-## 📦 ENTREGABLE 1: Documento de análisis DDD (20 puntos) - [Estudiante 1]
-*(Abran el archivo `DDD_ANALYSIS.md` en su entorno visual o GitHub)*
+## 🗣️ INTRODUCCIÓN Y ARQUITECTURA GENERAL
 
-1. **Event Storming – Claridad y completitud (5 pts):**
-   - **Explicación:** *"En la sección 2.1 documentamos una tabla exhaustiva con 20 eventos de dominio. Aquí puede observar cómo identificamos claramente al **Actor**, el **Comando** y el **Evento de Dominio** en pasado (ej. `VehiculoRegistrado`). En la sección 2.2, modelamos un diagrama visual usando Mermaid que agrupa estos flujos por dominio."*
+### 👤 [Estudiante 1]
+**"Buenos días, ingeniero. Presentamos la Fase 2 de la plataforma LogiFlow. En la fase anterior teníamos un monolito dividido en dos microservicios REST/SOAP básicos. Para esta Fase 2, hemos evolucionado el sistema a una arquitectura de microservicios distribuida y reactiva, orientada a eventos, con una capa de agregación unificada por un GraphQL Gateway, comunicación en tiempo real y despliegue automatizado en Kubernetes."**
 
-2. **Dominios – Correcta clasificación (4 pts):**
-   - **Explicación:** *"Clasificamos el sistema en la sección 3. Definimos nuestro **Core Domain** como 'Ruteo y Despacho', ya que es el núcleo estratégico. Agrupamos los **Supporting Domains** como 'Gestión de Flota' y 'Mantenimiento/Taller' porque proveen recursos indispensables. Finalmente, los **Generic Domains** como Facturación."*
-
-3. **Bounded Contexts – Definición completa (4 pts):**
-   - **Explicación:** *"Definimos 10 Bounded Contexts. Por ejemplo, en el **BC-01: Gestión de Flota**, delimitamos su responsabilidad al CRUD y disponibilidad. Definimos que su Agregado Root es `Vehiculo`, y que se comunicará vía protocolo REST."*
-
-4. **Lenguaje ubicuo – Coherencia y relevancia (3 pts):**
-   - **Explicación:** *"Estructuramos el Lenguaje Ubicuo en la sección 5.1. Definimos términos de negocio que mapeamos directamente al código: el término 'Disponibilidad' se refleja en la variable `disponible` de nuestra clase `Conductor.java` y en el endpoint `/disponibles`."*
-
-5. **Context Map – Identificación y justificación de patrones (4 pts):**
-   - **Explicación:** *"En la sección 6 modelamos el Context Map. Usamos patrones estratégicos: entre Taller y Flota existe un patrón de **Anti-Corruption Layer (ACL)**, aislando nuestro dominio interno. También usamos **Upstream/Downstream** donde la Flota provee información al Ruteo."*
+**"Para facilitar la defensa, dividiremos la presentación en dos bloques de 4 microservicios cada uno, seguidos del despliegue de infraestructura y análisis de calidad."**
 
 ---
 
-## 🚛 ENTREGABLE 2: Microservicio REST: ms-flota-rest (20 puntos) - [Estudiante 1]
-*(Abran el Swagger de Flota y el IDE mostrando el `VehiculoController.java`)*
+## 🔑 BLOQUE 1: SEGURIDAD, CLIENTES Y PEDIDOS (Estudiante 1)
 
-1. **Estructura del código y manejo de errores (3 pts):**
-   - **Explicación:** *"Ingeniero, hemos diseñado el modelo utilizando **UUID** (`java.util.UUID`) como clave primaria en lugar de enteros autoincrementales, aplicando mejores prácticas para seguridad en microservicios distribuidos. Además, implementamos un `@ControllerAdvice` para capturar validaciones."*
+*(Muestra en el IDE las carpetas de `ms-auth`, `ms-clientes` y `ms-pedidos`)*
 
-2. **CRUD vehículos y API documentada (9 pts):**
-   - **Explicación:** *"En `VehiculoController` usamos semántica HTTP estricta: `@PostMapping` para crear, `@GetMapping("/{id}")` para consultar, `@PutMapping` y `@DeleteMapping`. Todo documentado con Swagger UI."* *(Hagan un POST rápido).*
+### 1. Autenticación Centralizada (`ms-auth` - Puerto 8083)
+**"El primer componente crítico es la seguridad. Diseñamos `ms-auth`, un microservicio REST que gestiona las identidades del sistema. En lugar de usar sesiones tradicionales de servidor, implementamos autenticación stateless mediante JWT (JSON Web Tokens). Las contraseñas se almacenan de forma segura utilizando hashing con BCrypt, y el microservicio expone endpoints para registrar usuarios, iniciar sesión y verificar tokens en tiempo real."**
 
-3. **CRUD conductores y Disponibilidad (8 pts):**
-   - **Explicación:** *"Validamos en `ConductorDTO` que la cédula tenga 10 dígitos. Además, el endpoint `/disponibles` filtra a nivel de base de datos y retorna exclusivamente aquellos vehículos/conductores operativos para ruteo."*
+### 2. Clientes y Cuentas Corporativas (`ms-clientes` - Puerto 8084)
+**"Para soportar el modelo de negocio multinivel, implementamos `ms-clientes`. Este servicio maneja el ciclo de vida de los clientes (particulares y corporativos). Para los clientes corporativos, implementamos una regla de negocio crítica: el control de saldo financiero mediante una entidad `CuentaCorporativa` con un límite de crédito. Cada vez que se crea un pedido, se valida si el cliente tiene fondos disponibles o crédito suficiente, garantizando la solvencia del servicio."**
 
----
-
-## 🔧 ENTREGABLE 3: Microservicio REST: ms-taller-rest (20 puntos) - [Estudiante 2 - TU TURNO]
-*(Toma la palabra, abre el IDE en `ms-taller-rest/pom.xml` y luego Swagger)*
-
-1. **Transformación a REST, código limpio y validación (4 pts):**
-   - **Acción:** *Muestra el `pom.xml` y explica la eliminación de SOAP.*
-   - **Explicación:** *"Ingeniero, para este entregable tomamos la decisión arquitectónica de **refactorizar por completo** el servicio original SOAP. Eliminamos todas las dependencias de JAXB y archivos WSDL, e incluimos `spring-boot-starter-web`. Además, **eliminamos la clase `TallerTranslator.java`** que usábamos como Capa Anticorrupción para SOAP, ya que ahora trabajamos limpiamente con `MantenimientoDTO` validado mediante `@NotBlank`."*
-
-2. **Endpoint GET /vehiculos/{matricula} funcional (6 pts):**
-   - **Acción:** *Abre Swagger de Taller (`http://localhost:8082/swagger-ui.html`) y ejecuta el GET con `PBC1234`.*
-   - **Explicación:** *"Aquí en Swagger expusimos el endpoint GET. Al pasar la matrícula por Path Variable, el controlador devuelve un JSON limpio mapeado a nuestro modelo de dominio `VehiculoTaller`. Como ve, nos retorna la marca, modelo y el estado actual del vehículo."*
-
-3. **Endpoint POST /mantenimientos funcional (6 pts):**
-   - **Acción:** *Ejecuta el POST en Swagger enviando el siguiente JSON:*
-     ```json
-     {
-       "matricula": "PBC1234",
-       "descripcion": "Cambio de aceite y filtros"
-     }
-     ```
-   - **Explicación:** *"El endpoint POST registra la orden. Le enviamos este JSON, el servicio lo procesa, simula el registro generando un UUID para la orden y nos responde con un código HTTP `201 Created` y el objeto consolidado."*
-
-4. **Documentación Swagger completa (4 pts):**
-   - **Acción:** *Muestra los esquemas y las respuestas 200, 201, 400 y 404 en Swagger.*
-   - **Explicación:** *"Añadimos `springdoc-openapi`. Todas las respuestas, tanto de éxito como de error (Bad Request, Not Found), están documentadas para garantizar un contrato API robusto con el frontend."*
+### 3. Creación de Pedidos (`ms-pedidos` - Puerto 8085)
+**"El corazón transaccional de este bloque es `ms-pedidos`. Cuando recibe una solicitud para crear un pedido, realiza una consulta REST interna a `ms-clientes` para validar la existencia del cliente y el estado financiero de su cuenta corporativa. Si el saldo es suficiente, el pedido se guarda en estado `REGISTRADO` y, de manera asíncrona, se publica el evento `pedido.creado` en el bus de mensajes RabbitMQ, desacoplando este proceso de la asignación de transporte."**
 
 ---
 
-## ☁️ ENTREGABLE 4: Infraestructura DevOps (20 puntos) - [Estudiante 2 - TU TURNO]
-*(Abre GitHub en la pestaña Actions, SonarCloud y Telegram)*
+## 🧪 DEMO EN VIVO - PARTE 1: REGISTRO Y EVENTO (Estudiante 1)
 
-1. **Repositorio y ramas correctamente configuradas (4 pts):**
-   - **Acción:** *Muestra el desplegable de ramas en GitHub.*
-   - **Explicación:** *"En cuanto a DevOps, manejamos un flujo Git profesional. Tenemos nuestras ramas aisladas: `main` para producción y `development` para desarrollo."*
+*(Abre GraphiQL en el navegador: `http://localhost:8080/graphiql`)*
 
-2. **Pipeline funcional y ejecución de análisis estático (5 pts):**
-   - **Acción:** *Muestra el archivo `.github/workflows/ci.yml`.*
-   - **Explicación:** *"Diseñamos un pipeline en GitHub Actions que de forma automatizada compila el proyecto y ejecuta las pruebas de ambos microservicios usando Maven. Como puede ver en la configuración, definimos jobs paralelos para optimizar el tiempo de construcción antes de dar paso al análisis de calidad."*
+**"Para demostrar la integración de este primer bloque, utilizaremos la interfaz de GraphiQL expuesta por el Gateway. Voy a ejecutar la creación de un nuevo pedido."**
 
-3. **Integración con SonarCloud sin errores graves (4 pts):**
-   - **Acción:** *Abre el dashboard de SonarCloud en la rama `main`.*
-   - **Explicación:** *"Nuestro pipeline se conecta de forma directa y segura con SonarCloud mediante tokens inyectados como secretos. Como puede observar en el dashboard principal, ambos microservicios (`ms-flota-rest` y `ms-taller-rest`) pasaron el Quality Gate de forma exitosa, sin Bugs críticos ni Vulnerabilidades de seguridad."*
+#### Acción 1: Crear Pedido mediante GraphQL Mutation
+*Ejecuta la siguiente mutation en GraphiQL:*
+```graphql
+mutation {
+  crearPedido(input: {
+    clienteId: "bf813017-0049-4217-bb19-481bf80c0abc"
+    descripcion: "Carga de suministros médicos urgentes"
+    peso: 350.0
+    origen: "Quito"
+    destino: "Guayaquil"
+    prioridad: "ALTA"
+  }) {
+    id
+    estado
+    prioridad
+  }
+}
+```
 
-4. **Notificaciones a Telegram y Demostración en Vivo (4 pts):**
-   - **Acción:** *Abre la terminal de tu IDE y Telegram Web a un lado.*
-   - **Explicación:** *"Al finalizar, usamos un bot para notificar a Telegram el estado de los jobs. Para demostrarle que nuestro pipeline es 100% funcional en vivo, **voy a disparar una ejecución manualmente desde la terminal** mediante un commit vacío."*
-   - **Acción en vivo:** *Copia, pega y ejecuta esto en la terminal frente al profesor:*
-     ```bash
-     git commit --allow-empty -m "Demo en vivo para presentacion: Trigger pipeline"
-     git push origin main
-     ```
-   - *"Si vamos a GitHub Actions, verá que el workflow acaba de arrancar. Y en un par de minutos, recibiremos este mensaje en Telegram notificando el éxito de la compilación y del análisis de código."*
+*Al recibir el JSON de respuesta exitosa:*
+**"Como observa, el Gateway nos devuelve el ID y el estado inicial `REGISTRADO`. En este mismo instante, `ms-pedidos` ha enviado de forma no bloqueante un mensaje a RabbitMQ. Doy el paso a mi compañero para explicar cómo se procesa esta información de forma asíncrona."**
 
-5. **README completo y claro (3 pts):**
-   - **Acción:** *Muestra la portada del repositorio en GitHub (`README.md`).*
-   - **Explicación:** *"Finalmente, documentamos todo en el README: diagramas de arquitectura, comandos para ejecución local y las instrucciones para inyectar los secretos de Sonar y Telegram. El proyecto está listo para ser replicado por cualquier desarrollador."*
+---
 
-**"Esto concluye nuestra presentación. Esperamos que el nivel de refactorización y automatización haya sido de su agrado. Muchas gracias."**
+## 🗺️ BLOQUE 2: RUTEO, SEGUIMIENTO Y TIEMPO REAL (Estudiante 2)
+
+*(Toma la palabra. Muestra en el IDE las carpetas de `ms-ruteo`, `ms-seguimiento` y `graphql-gateway`)*
+
+### 👤 [Estudiante 2]
+**"Gracias. Continuamos con el procesamiento de los eventos de negocio."**
+
+### 1. Consumo y Asignación de Rutas (`ms-ruteo` - Puerto 8086)
+**"El microservicio `ms-ruteo` está escuchando la cola de RabbitMQ. Al capturar el evento `pedido.creado`, inicia la orquestación: realiza llamadas REST a `ms-flota-rest` para buscar vehículos y conductores aptos y disponibles. Cuando los encuentra, asocia el viaje, calcula la ruta óptima y crea un registro `Envio`. Además, a través de peticiones PATCH de `RestTemplate` actualiza el estado de la flota a `EN_SERVICIO` y el del pedido a `ASIGNADO`. Finalmente, publica el evento `envio.asignado` en RabbitMQ."**
+*(Nota técnica si pregunta sobre PATCH: Corregimos la fábrica del `RestTemplate` usando `JdkClientHttpRequestFactory` para permitir peticiones PATCH nativas en Java 17).*
+
+### 2. Transmisión WebSocket y GraphQL Gateway (`ms-seguimiento` y `graphql-gateway`)
+**"Para la última milla y el monitoreo por parte del cliente, necesitamos tiempo real. Implementamos `ms-seguimiento` (Puerto 8087), que levanta un broker WebSocket STOMP. Este servicio consume las coordenadas del simulador GPS de `ms-ruteo` desde RabbitMQ y las inyecta en el canal WebSocket `/topic/seguimiento/{envioId}`."**
+
+**"Por otro lado, nuestro GraphQL Gateway (Puerto 8080) expone una suscripción reactiva (`Subscription tracking`). Internamente, lee los eventos GPS desde RabbitMQ y, usando la programación reactiva de Spring WebFlux con un `Sinks.Many` multicast, transmite el flujo de coordenadas directamente a los clientes conectados a GraphQL sin necesidad de WebSockets tradicionales adicionales."**
+
+---
+
+## 🧪 DEMO EN VIVO - PARTE 2: TIEMPO REAL GPS (Estudiante 2)
+
+*(Abre GraphiQL, limpia la pantalla anterior y prepara la suscripción y la simulación)*
+
+**"Vamos a demostrar el rastreo en vivo. Primero, me suscribiré al canal de rastreo utilizando la Subscription de GraphQL en el Gateway."**
+
+#### Acción 2: Activar Suscripción en GraphiQL
+*Ejecuta en GraphiQL:*
+```graphql
+subscription {
+  tracking(envioId: "62e95be9-a6db-460f-a675-84aa8be82187") {
+    envioId
+    lat
+    lng
+    velocidad
+    timestamp
+  }
+}
+```
+*(El panel de GraphiQL quedará a la espera de datos en tiempo real).*
+
+#### Acción 3: Disparar Simulación GPS
+*Abre otra pestaña o terminal y ejecuta un POST simulado a `ms-ruteo`:*
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://localhost:8086/api/ruteo/envios/62e95be9-a6db-460f-a675-84aa8be82187/simular"
+```
+
+*Vuelve a la pantalla de GraphiQL para que el docente vea las coordenadas fluyendo dinámicamente:*
+**"Aquí puede ver cómo las coordenadas GPS simuladas fluyen instantáneamente en formato JSON al cliente de GraphQL en tiempo real. No hay peticiones HTTP continuas (polling), es una conexión persistente reactiva mediante WebSockets estructurados en GraphQL."**
+
+---
+
+## ⚓ INFRAESTRUCTURA DEVOPS Y KUBERNETES (Estudiante 2)
+
+*(Muestra la carpeta `k8s/` en el IDE o abre `microservices.yaml`)*
+
+**"Para desplegar y escalar este ecosistema de 8 microservicios de manera profesional, implementamos manifiestos de Kubernetes:"**
+
+1. **Infraestructura (`k8s/infrastructure.yaml`)**:
+   **"Provisiona una base de datos PostgreSQL multi-esquema con un script de inicialización automática (`postgres-init-sql`) y la instancia del broker RabbitMQ."**
+2. **Microservicios (`k8s/microservices.yaml`)**:
+   **"Define los Deployments y Services de los 8 contenedores. Se configuró `imagePullPolicy: IfNotPresent` para utilizar las imágenes compiladas localmente en Docker, y se inyectaron variables de entorno DNS internas para interconectar los servicios dentro del clúster (ej. `http://ms-clientes:8084`)."**
+3. **Ingress (`k8s/ingress.yaml`)**:
+   **"Utilizamos Nginx Ingress para exponer un único punto de entrada en el puerto 80 del host, enrutando dinámicamente el tráfico a `/api/auth`, `/api/pedidos`, `/graphql` y `/ws/seguimiento`."**
+
+---
+
+## 📊 INTEGRACIÓN CONTINUA Y CALIDAD CON SONARCLOUD (Estudiante 2)
+
+*(Muestra el archivo `.github/workflows/ci.yml` y luego abre tu panel de SonarCloud)*
+
+**"Finalmente, el aseguramiento de la calidad se automatizó en el pipeline CI/CD en GitHub Actions (`ci.yml`):"**
+* **"Al hacer un push, el pipeline compila y corre tests automáticos en los 8 microservicios."**
+* **"Posteriormente, el job `sonarcloud-analysis` ejecuta un análisis estático detallado para cada módulo."**
+* **"Para comprobar el análisis local, hemos configurado un comando Maven en PowerShell usando el operador de stop-parsing `--%` para evitar que la shell altere los flags `-D`. Esto permite verificar bugs, code smells y vulnerabilidades de seguridad a nivel local antes de subir el código."**
+
+---
+
+## 🗣️ CIERRE DE LA PRESENTACIÓN
+
+### 👤 [Estudiante 1]
+**"Con esto demostramos que LogiFlow es una plataforma desacoplada, segura, tolerante a fallos, construida bajo prácticas de Domain-Driven Design y lista para producción en contenedores y orquestación K8s."**
+
+### 👤 [Estudiante 2]
+**"Muchas gracias por su atención, ingeniero. Quedamos abiertos a sus preguntas."**
