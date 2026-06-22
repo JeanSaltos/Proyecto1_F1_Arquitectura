@@ -142,6 +142,12 @@ public class ClienteService {
     }
 
     @Transactional
+    public void eliminarCuenta(UUID id) {
+        CuentaCorporativa cuenta = buscarCuentaPorId(id);
+        cuentaRepository.delete(cuenta);
+    }
+
+    @Transactional
     public CuentaCorporativa deducirSaldo(UUID clienteId, BigDecimal monto) {
         CuentaCorporativa cuenta = obtenerCuentaPorClienteId(clienteId);
 

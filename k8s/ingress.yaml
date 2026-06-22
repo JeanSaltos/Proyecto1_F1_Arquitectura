@@ -3,13 +3,15 @@ kind: Ingress
 metadata:
   name: logiflow-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    # Permite conexiones persistentes para WebSockets
-    nginx.ingress.kubernetes.io/websocket-services: "ms-seguimiento,graphql-gateway"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 spec:
+  ingressClassName: nginx
   rules:
     - http:
         paths:
+          # REST - Fase 1/Fase 2
           - path: /api/auth
             pathType: Prefix
             backend:
@@ -52,20 +54,15 @@ spec:
                 name: ms-flota-rest
                 port:
                   number: 8081
-          - path: /api/taller
-            pathType: Prefix
+
+          # SOAP - ms-taller-soap. Preserva /ws y /ws/taller.wsdl.
+          - path: /ws/taller.wsdl
+            pathType: Exact
             backend:
               service:
                 name: ms-taller-rest
                 port:
                   number: 8082
-          - path: /graphql
-            pathType: Prefix
-            backend:
-              service:
-                name: graphql-gateway
-                port:
-                  number: 8080
           - path: /ws/seguimiento
             pathType: Prefix
             backend:
@@ -73,3 +70,26 @@ spec:
                 name: ms-seguimiento
                 port:
                   number: 8087
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: ms-taller-rest
+                port:
+                  number: 8082
+
+          # GraphQL HTTP, GraphiQL y GraphQL subscriptions por WebSocket.
+          - path: /graphql
+            pathType: Prefix
+            backend:
+              service:
+                name: graphql-gateway
+                port:
+                  number: 8080
+          - path: /graphiql
+            pathType: Prefix
+            backend:
+              service:
+                name: graphql-gateway
+                port:
+                  number: 8080

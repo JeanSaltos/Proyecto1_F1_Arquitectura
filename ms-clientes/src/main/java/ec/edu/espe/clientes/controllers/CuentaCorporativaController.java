@@ -59,6 +59,17 @@ public class CuentaCorporativaController {
         return ResponseEntity.ok(service.actualizarCuenta(id, dto));
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar cuenta corporativa")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Cuenta eliminada con exito"),
+            @ApiResponse(responseCode = "404", description = "Cuenta corporativa no encontrada")
+    })
+    public ResponseEntity<Void> eliminar(@PathVariable UUID id) {
+        service.eliminarCuenta(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/cliente/{clienteId}/deducir")
     @Operation(summary = "Deducir saldo de la cuenta por servicio logístico")
     public ResponseEntity<CuentaCorporativa> deducir(

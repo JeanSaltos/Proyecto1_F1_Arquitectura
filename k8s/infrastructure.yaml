@@ -40,11 +40,34 @@ spec:
           image: postgres:14-alpine
           env:
             - name: POSTGRES_USER
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: logiflow-secrets
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
-              value: "1234"
+              valueFrom:
+                secretKeyRef:
+                  name: logiflow-secrets
+                  key: POSTGRES_PASSWORD
           ports:
             - containerPort: 5432
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           volumeMounts:
             - name: init-sql-volume
               mountPath: /docker-entrypoint-initdb.d
@@ -87,9 +110,32 @@ spec:
           image: rabbitmq:3-management-alpine
           env:
             - name: RABBITMQ_DEFAULT_USER
-              value: guest
+              valueFrom:
+                secretKeyRef:
+                  name: logiflow-secrets
+                  key: RABBITMQ_DEFAULT_USER
             - name: RABBITMQ_DEFAULT_PASS
-              value: guest
+              valueFrom:
+                secretKeyRef:
+                  name: logiflow-secrets
+                  key: RABBITMQ_DEFAULT_PASS
           ports:
             - containerPort: 5672
             - containerPort: 15672
+          readinessProbe:
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

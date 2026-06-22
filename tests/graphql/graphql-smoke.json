@@ -1,0 +1,6 @@
+{
+  "query": "query PedidosActivos($clienteId: ID!) { pedidosActivos(clienteId: $clienteId) { id estado prioridad } }",
+  "variables": {
+    "clienteId": "00000000-0000-0000-0000-000000000001"
+  }
+}
